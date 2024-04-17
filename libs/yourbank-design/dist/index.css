@@ -1,9 +1,76 @@
 /* add css module styles here (optional) */
 
-._3ybTi {
-  margin: 2em;
-  padding: 0.5em;
-  border: 2px solid #000;
-  font-size: 2em;
-  text-align: center;
+
+
+/* Container styles */
+._1Lxpd {
+  width: 100%;
+  max-width: 1200px; /* max-width can be adjusted */
+  margin: 0 auto; /* center the container */
+  padding: 20px;
+  background-color: #fff; /* change to match your brand */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* subtle shadow */
+}
+
+._38Bir {
+  background-color: #f8f9fa; /* Example background color, change as needed */
+  /* If you want to use a background image instead, uncomment the following line and replace 'url-to-your-image' with the actual path */
+  /* background-image: url('url-to-your-image'); */
+  background-repeat: no-repeat;
+  background-size: cover; /* cover will make sure that your background covers the entire element */
+  background-position: center center;
+}
+
+/* Button styles */
+._2hTXI {
+  padding: 10px 20px;
+  background-color: #c0392b; /* primary brand color, change this */
+  color: #fff; /* text color */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  text-transform: uppercase; /* button text style */
+  transition: background-color 0.3s ease; /* transition for hover effect */
+}
+
+._2hTXI:hover {
+  background-color: #e74c3c; /* slightly lighter on hover, change this */
+}
+
+/* Table styles */
+._FnYjQ {
+  width: 100%;
+  border-collapse: collapse; /* for a clean look */
+}
+
+._FnYjQ th,
+._FnYjQ td {
+  text-align: left;
+  padding: 15px;
+  border-bottom: 1px solid #ddd; /* light line for separating rows */
+}
+
+._FnYjQ th {
+  background-color: #c0392b; /* header background, change this */
+  color: #fff; /* header text color */
+}
+
+._3NyrT tbody tr:nth-of-type(odd) {
+  background-color: #f9f9f9; /* zebra-striping for rows, change this */
+}
+
+/* Adjust the colors and sizes as per your brand guidelines */
+
+
+._xsi02 {
+  background: #ffffff; /* Assuming a white card background */
+  border-radius: 4px;
+  padding: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* This is a slight drop shadow */
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+._xsi02:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Slightly more pronounced shadow on hover */
 }
