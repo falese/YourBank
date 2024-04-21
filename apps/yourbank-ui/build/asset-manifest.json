@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/static/css/main.c60835b4.css",
-    "main.js": "/static/js/main.7847757f.js",
-    "static/js/400.55ab1f90.chunk.js": "/static/js/400.55ab1f90.chunk.js",
-    "static/media/logo.svg": "/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
-    "index.html": "/index.html",
-    "main.c60835b4.css.map": "/static/css/main.c60835b4.css.map",
-    "main.7847757f.js.map": "/static/js/main.7847757f.js.map",
-    "400.55ab1f90.chunk.js.map": "/static/js/400.55ab1f90.chunk.js.map"
+    "main.css": "/yourbank/static/css/main.c60835b4.css",
+    "main.js": "/yourbank/static/js/main.6aa2a1d8.js",
+    "static/js/400.55ab1f90.chunk.js": "/yourbank/static/js/400.55ab1f90.chunk.js",
+    "static/media/logo.svg": "/yourbank/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
+    "index.html": "/yourbank/index.html",
+    "main.c60835b4.css.map": "/yourbank/static/css/main.c60835b4.css.map",
+    "main.6aa2a1d8.js.map": "/yourbank/static/js/main.6aa2a1d8.js.map",
+    "400.55ab1f90.chunk.js.map": "/yourbank/static/js/400.55ab1f90.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.c60835b4.css",
-    "static/js/main.7847757f.js"
+    "static/js/main.6aa2a1d8.js"
   ]
 }
