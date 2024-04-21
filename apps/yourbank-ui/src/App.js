@@ -15,48 +15,48 @@ function App() {
           color="red"
           style={{height: '88px', width: '88px'}}
         />}
-        footer={<Button variant='primary'>Push Me</Button>}
+        footer={<Button variant='primary'>Get Started</Button>}
         >
             <p>
              We can help you move money.  Anywhere, Anytime.
             </p>
         </Card>
         <Card
-        headerTitle="The Your Bank Second Card"
+        headerTitle="YourLoans"
         underHeaderIcon={<Icon 
           icon="building" 
           color="red"
           style={{height: '88px', width: '88px'}}
         />}
-        footer={<Button variant='primary'>Push Me</Button>}
+        footer={<Button variant='primary'>Get Started</Button>}
         >
             <p>
-              The card has a header and a footer
+              We can help you get and manage credit.
             </p>
         </Card>
   
         <Card
-        headerTitle="The Your Bank Third Card"
+        headerTitle="YourRelationship"
         underHeaderIcon={<LogoComponent
           style={{width:'88px', height: '88px',color: 'red'}} 
           />}
-        footer={<Button variant='primary'>Push Me</Button>}
+        footer={<Button variant='primary'>Get Started</Button>}
         >
             <p>
-              The card has a header and a footer
+              We're in this together.
             </p>
         </Card>
         <Card
-        headerTitle="The Your Bank Fourth Card"
+        headerTitle="YourInsights"
         underHeaderIcon={<Icon 
           icon="chart" 
           color="red"
           style={{height: '88px', width: '88px'}}
         />}
-        footer={<Button variant='primary'>Push Me</Button>}
+        footer={<Button variant='primary'>Get Started</Button>}
         >
             <p>
-              The card has a header and a footer
+              We can help you find the your next big thing.
             </p>
         </Card>
         
@@ -64,30 +64,30 @@ function App() {
 
       <Container>
         <Card
-        headerTitle="The Your Bank"
+        headerTitle="About Us"
         underHeaderIcon={<Icon 
           icon="building" 
           color="red"
           style={{height: '88px', width: '88px'}}
         />}
-        footer={<Button variant='primary'>Push Me</Button>}
+        footer={<Button variant='primary'>Learn More</Button>}
         >
             <p>
-              The card has a header and a footer
+              Learn who we are, and why we care so much about you.
             </p>
         </Card>
         
         <Card
-        headerTitle="The Your Bank"
+        headerTitle="Invest"
         underHeaderIcon={<Icon 
           icon="dollar" 
           color="red"
           style={{height: '88px', width: '88px'}}
         />}
-        footer={<Button variant='primary'>Push Me</Button>}
+        footer={<Button variant='primary'>Learn More</Button>}
         >
             <p>
-              The card has a header and a footer
+              YourBank, its not just how we operate, its how we're owned.
             </p>
         </Card>
         
