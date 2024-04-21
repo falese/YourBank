@@ -1,0 +1,224 @@
+/* typography and basic stylings */
+body {
+  font-family: 'Helvetica Neue', Arial, sans-serif; /* Example font, you can change this */
+  font-size: 16px; /* Base font size */
+  line-height: 1.6; /* Line height for readability */
+  color: #333; /* Default text color */
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Georgia', serif; /* A different font for headings, change as needed */
+  color: #222; /* Typically darker or different to distinguish from body text */
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+h1 {
+  font-size: 2.25em; /* Example sizing, adjust based on design */
+}
+
+h2 {
+  font-size: 2em;
+}
+
+h3 {
+  font-size: 1.75em;
+}
+
+h4 {
+  font-size: 1.5em;
+}
+
+h5 {
+  font-size: 1.25em;
+}
+
+h6 {
+  font-size: 1em;
+}
+
+p {
+  margin-bottom: 1em;
+}
+
+strong {
+  font-weight: bold;
+}
+
+em {
+  font-style: italic;
+}
+
+
+/* Container styles */
+._1Lxpd {
+  max-width: 1200px; /* max-width can be adjusted */
+  margin: 0 auto; /* center the container */
+  padding: 20px;
+  background-color: #fff; /* change to match your brand */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* subtle shadow */
+}
+
+._2PVO1 {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around; /* Ensures that cards are evenly spaced */
+  padding: 20px;
+  background: #fff;
+}
+
+._38Bir {
+  background-color: #f8f9fa; /* Example background color, change as needed */
+  /* If you want to use a background image instead, uncomment the following line and replace 'url-to-your-image' with the actual path */
+  /* background-image: url('url-to-your-image'); */
+  background-repeat: no-repeat;
+  background-size: cover; /* cover will make sure that your background covers the entire element */
+  background-position: center center;
+}
+
+/* Button styles */
+._2hTXI {
+  padding: 10px 20px;
+  background-color: #c0392b; /* primary brand color, change this */
+  color: #fff; /* text color */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  text-transform: uppercase; /* button text style */
+  transition: background-color 0.3s ease; /* transition for hover effect */
+}
+
+._2hTXI:hover {
+  background-color: #e74c3c; /* slightly lighter on hover, change this */
+}
+
+/* Table styles */
+._FnYjQ {
+  width: 100%;
+  border-collapse: collapse; /* for a clean look */
+}
+
+._FnYjQ th,
+._FnYjQ td {
+  text-align: left;
+  padding: 15px;
+  border-bottom: 1px solid #ddd; /* light line for separating rows */
+}
+
+._FnYjQ th {
+  background-color: #c0392b; /* header background, change this */
+  color: #fff; /* header text color */
+}
+
+._3NyrT tbody tr:nth-of-type(odd) {
+  background-color: #f9f9f9; /* zebra-striping for rows, change this */
+}
+
+/* Adjust the colors and sizes as per your brand guidelines */
+
+/* Card.module.css */
+/* .card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}*/
+/* Card.module.css */
+
+/* CardContainer.module.css */
+
+
+
+
+._xsi02 {
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  margin: 10px;
+  padding: 20px;
+  background-color: #f7f7f7;
+  border-radius: 8px;
+  flex: 1 1 calc(12.5% - 20px); /* 33.333% for 3 cards in a row, -20px accounts for margin */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers the content horizontally */
+  text-align: center; /* Ensures text is centered */
+}
+
+@media (max-width: 768px) {
+  ._xsi02 {
+    flex: 1 1 calc(50% - 20px); /* Adjust for fewer columns on smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  ._xsi02 {
+    flex: 1 1 100%; /* Each card takes full width on very small screens */
+  }
+}
+
+
+._2cQtw {
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0;
+  width: 100%; /* Full width to align text and icons centrally */
+  text-align: center; /* Centers text and any inline or inline-block elements */
+}
+
+._oI8tQ {
+  display: flex;
+  flex-direction: column; /* Stack elements vertically */
+  align-items: center; /* Center align items */
+}
+
+._2yKGs {
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+
+._TN3it {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+ 
+}
+
+._2ZnC8 {
+  padding: 20px;
+  flex-grow: 1;
+  color: #666;
+  text-align: center; /* Centers text content */
+  width: 100%; /* Ensures content uses full available width */
+}
+
+._2PuQp {
+  padding: 16px;
+  border-top: 1px solid #e0e0e0;
+  width: 100%; /* Full width for consistent styling */
+  display: flex;
+  justify-content: center; /* Center-aligns children (buttons, text) */
+}
+
+
+
+._2Vept {
+  width: 24px; /* Default size */
+  height: 24px; /* Default size */
+  fill: currentColor; /* Color is set by 'color' style */
+}
+
+/* General color styles */
+._EipcL {
+  color: #e74c3c; /* Red color */
+}
+
+._2MHdX {
+  color: #ffffff; /* White color */
+}
