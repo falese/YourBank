@@ -9,7 +9,7 @@ function App() {
       useCardStyle={true}
       >
         <Card
-        headerTitle="The Your Bank First Card"
+        headerTitle="YourMoney"
         underHeaderIcon={<Icon 
           icon="money" 
           color="red"
@@ -18,7 +18,7 @@ function App() {
         footer={<Button variant='primary'>Push Me</Button>}
         >
             <p>
-              The card has a header and a footer
+             We can help you move money.  Anywhere, Anytime.
             </p>
         </Card>
         <Card

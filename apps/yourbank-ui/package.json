@@ -11,13 +11,14 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "yourbank-design":"workspace:*"
   },
   "scripts": {
-    "predeploy": "npm run build",
+    "predeploy": "yarn run build",
     "deploy": "gh-pages -b main -d build",
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "yarn install && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
