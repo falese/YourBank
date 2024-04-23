@@ -1,9 +1,12 @@
 import logo from './logo.svg';
 import {Button, Container, Card, Icon, LogoComponent} from 'yourbank-design'
 
+
+
 function App() {
   return (
     <div className="App">
+      
       <Container>
       <Container 
       useCardStyle={true}
@@ -94,6 +97,8 @@ function App() {
         
       </Container>
       </Container>
+
+      
     </div>
   );
 }

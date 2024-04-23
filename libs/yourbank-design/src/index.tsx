@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useContext, createContext, useReducer, ReactNode } from 'react'
 import styles from './styles.module.css'
 
 // Button
@@ -20,25 +21,6 @@ export const Button: React.FC<ButtonProps> = ({
     </button>
   )
 }
-
-// interface ContainerProps extends React.HTMLAttributes<HTMLDivElement> {
-//   hasBackground?: boolean
-// }
-
-// export const Container: React.FC<ContainerProps> = ({
-//   hasBackground,
-//   children,
-//   ...props
-// }) => {
-//   const className = `${styles.container} ${
-//     hasBackground ? styles.background : ''
-//   }`
-//   return (
-//     <div className={className} {...props}>
-//       {children}
-//     </div>
-//   )
-// }
 
 // Container.tsx
 
