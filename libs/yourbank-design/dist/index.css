@@ -1,4 +1,13 @@
 /* typography and basic stylings */
+/* styles/themes.css */
+:root {
+  --background-light: #fff;
+  --text-color-light: #000;
+
+  --background-dark: #333;
+  --text-color-dark: #fff;
+}
+
 body {
   font-family: 'Helvetica Neue', Arial, sans-serif; /* Example font, you can change this */
   font-size: 16px; /* Base font size */
@@ -6,6 +15,9 @@ body {
   color: #333; /* Default text color */
   margin: 0;
   padding: 0;
+  background-color: var(--background-color);
+  color: var(--text-color);
+
 }
 
 h1, h2, h3, h4, h5, h6 {

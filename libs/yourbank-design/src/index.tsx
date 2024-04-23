@@ -21,25 +21,6 @@ export const Button: React.FC<ButtonProps> = ({
   )
 }
 
-// interface ContainerProps extends React.HTMLAttributes<HTMLDivElement> {
-//   hasBackground?: boolean
-// }
-
-// export const Container: React.FC<ContainerProps> = ({
-//   hasBackground,
-//   children,
-//   ...props
-// }) => {
-//   const className = `${styles.container} ${
-//     hasBackground ? styles.background : ''
-//   }`
-//   return (
-//     <div className={className} {...props}>
-//       {children}
-//     </div>
-//   )
-// }
-
 // Container.tsx
 
 interface ContainerProps {
