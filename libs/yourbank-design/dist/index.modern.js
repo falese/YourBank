@@ -1,4 +1,4 @@
-import { useContext, createElement, createContext, useReducer } from 'react';
+import { createElement } from 'react';
 
 function _extends() {
   _extends = Object.assign ? Object.assign.bind() : function (target) {
@@ -31,19 +31,6 @@ var styles = {"container":"_1Lxpd","cardContainer":"_2PVO1","background":"_38Bir
 
 var _excluded = ["variant", "children"],
   _excluded2 = ["headerIcon", "headerTitle", "footer", "children", "underHeaderIcon"];
-var ThemeToggle = function ThemeToggle() {
-  var _useContext = useContext(GlobalContext),
-    theme = _useContext.theme,
-    toggleTheme = _useContext.toggleTheme;
-  return createElement("div", {
-    style: {
-      background: theme === 'dark' ? 'black' : 'white',
-      color: theme === 'dark' ? 'white' : 'black'
-    }
-  }, "Current Theme: ", theme, createElement("button", {
-    onClick: toggleTheme
-  }, "Toggle Theme"));
-};
 var Button = function Button(_ref) {
   var _ref$variant = _ref.variant,
     variant = _ref$variant === void 0 ? 'primary' : _ref$variant,
@@ -152,51 +139,6 @@ var LogoComponent = function LogoComponent(_ref6) {
     d: 'M743 641.5v179.7l33.3-.5c37-.4 37.9-.6 51.3-7.6 16.7-8.6 29.5-24.2 33-39.9 2.2-9.8 1.5-26.1-1.5-34.4-5.5-15.8-20.9-32.2-38.6-41-11.4-5.7-19.8-8-38.7-10.3l-4.8-.6V585.2l7.8-.7c24.1-2.1 41.6-10.5 54-25.9 9.6-11.9 13.2-22 13.2-37 0-11.9-1.4-17.8-6.5-27.6-7-13.1-19.6-23.2-36-28.7-7.8-2.7-8.6-2.7-37.2-3.1l-29.3-.3v179.6z'
   }));
 };
-var initialState = {
-  theme: 'light'
-};
-var GlobalContext = createContext(_extends({}, initialState, {
-  toggleTheme: function toggleTheme() {},
-  setTheme: function setTheme() {}
-}));
-function globalReducer(state, action) {
-  switch (action.type) {
-    case 'TOGGLE_THEME':
-      return _extends({}, state, {
-        theme: state.theme === 'light' ? 'dark' : 'light'
-      });
-    case 'SET_THEME':
-      return _extends({}, state, {
-        theme: action.payload
-      });
-    default:
-      return state;
-  }
-}
-var GlobalProvider = function GlobalProvider(_ref7) {
-  var children = _ref7.children;
-  var _useReducer = useReducer(globalReducer, initialState),
-    state = _useReducer[0],
-    dispatch = _useReducer[1];
-  var toggleTheme = function toggleTheme() {
-    dispatch({
-      type: 'TOGGLE_THEME'
-    });
-  };
-  var setTheme = function setTheme(theme) {
-    dispatch({
-      type: 'SET_THEME',
-      payload: theme
-    });
-  };
-  var value = _extends({}, state, {
-    toggleTheme: toggleTheme,
-    setTheme: setTheme
-  });
-  return createElement(GlobalContext.Provider, {
-    value: value
-  }, children);
-};
 
-export { Button, Card, Container, GlobalContext, GlobalProvider, Icon, LogoComponent, Table, ThemeToggle };
+export { Button, Card, Container, Icon, LogoComponent, Table };
 //# sourceMappingURL=index.modern.js.map

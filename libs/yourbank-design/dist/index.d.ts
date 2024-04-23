@@ -1,6 +1,4 @@
 import * as React from 'react';
-import { ReactNode } from 'react';
-export declare const ThemeToggle: React.FC;
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: 'primary' | 'secondary';
 }
@@ -37,16 +35,4 @@ interface LogoProps {
     style?: React.CSSProperties;
 }
 export declare const LogoComponent: React.FC<LogoProps>;
-interface GlobalState {
-    theme: 'light' | 'dark';
-}
-interface GlobalContextType extends GlobalState {
-    toggleTheme: () => void;
-    setTheme: (theme: 'light' | 'dark') => void;
-}
-export declare const GlobalContext: React.Context<GlobalContextType>;
-interface GlobalProviderProps {
-    children: ReactNode;
-}
-export declare const GlobalProvider: React.FC<GlobalProviderProps>;
 export {};
