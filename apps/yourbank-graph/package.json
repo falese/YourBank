@@ -1,0 +1,20 @@
+{
+  "name": "yourbank-graph",
+  "version": "1.0.0",
+  "description": "the yourbank graphQL implementation",
+  "main": "index.js",
+  "license": "MIT",
+  "private": "true",
+  "dependencies": {
+    "@apollo/server": "^4.10.4",
+    "@types/node": "^20.12.8",
+    "graphql": "^16.8.1",
+    "typescript": "^5.4.5"
+  },
+      "type": "module",
+      "scripts": {
+        "compile": "tsc",
+        "start": "npm run compile && node ./dist/index.js"
+  }
+      
+}
