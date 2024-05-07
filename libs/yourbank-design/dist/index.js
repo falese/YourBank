@@ -27,10 +27,17 @@ function _objectWithoutPropertiesLoose(source, excluded) {
   return target;
 }
 
-var styles = {"container":"_1Lxpd","cardContainer":"_2PVO1","background":"_38Bir","button":"_2hTXI","table":"_FnYjQ","table-striped":"_3NyrT","card":"_xsi02","cardHeader":"_2cQtw","headerContent":"_oI8tQ","cardTitle":"_2yKGs","underHeaderIcon":"_TN3it","cardContent":"_2ZnC8","cardFooter":"_2PuQp","icon":"_2Vept","icon-red":"_EipcL","icon-white":"_2MHdX"};
+var styles = {"header":"_1aDvk","logo":"_Lw2P8","container":"_1Lxpd","cardContainer":"_2PVO1","background":"_38Bir","button":"_2hTXI","table":"_FnYjQ","table-striped":"_3NyrT","card":"_xsi02","cardHeader":"_2cQtw","headerContent":"_oI8tQ","cardTitle":"_2yKGs","underHeaderIcon":"_TN3it","cardContent":"_2ZnC8","cardFooter":"_2PuQp","icon":"_2Vept","icon-red":"_EipcL","icon-white":"_2MHdX"};
 
 var _excluded = ["variant", "children"],
   _excluded2 = ["headerIcon", "headerTitle", "footer", "children", "underHeaderIcon"];
+var Header = function Header() {
+  return React.createElement("header", {
+    className: styles.header
+  }, React.createElement("h1", {
+    className: styles.logo
+  }, "YourBank"));
+};
 var Button = function Button(_ref) {
   var _ref$variant = _ref.variant,
     variant = _ref$variant === void 0 ? 'primary' : _ref$variant,
@@ -146,4 +153,5 @@ exports.Container = Container;
 exports.Icon = Icon;
 exports.LogoComponent = LogoComponent;
 exports.Table = Table;
+exports.default = Header;
 //# sourceMappingURL=index.js.map

@@ -1,4 +1,6 @@
 import * as React from 'react';
+declare const Header: React.FC;
+export default Header;
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: 'primary' | 'secondary';
 }
@@ -35,4 +37,3 @@ interface LogoProps {
     style?: React.CSSProperties;
 }
 export declare const LogoComponent: React.FC<LogoProps>;
-export {};
