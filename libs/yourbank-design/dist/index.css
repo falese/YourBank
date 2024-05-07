@@ -8,6 +8,22 @@
   --text-color-dark: #fff;
 }
 
+._1aDvk {
+  background-color: #c0392b;
+  color: #fff; /* text color */
+  padding: 20px 40px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+._Lw2P8 {
+  font-family: 'Arial', sans-serif;
+  font-size: 24px;
+  color: #333;
+}
+
 body {
   font-family: 'Helvetica Neue', Arial, sans-serif; /* Example font, you can change this */
   font-size: 16px; /* Base font size */

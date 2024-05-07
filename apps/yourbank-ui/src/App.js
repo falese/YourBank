@@ -1,12 +1,14 @@
 import logo from './logo.svg';
-import {Button, Container, Card, Icon, LogoComponent} from 'yourbank-design'
+import Header, {Button, Container, Card, Icon, LogoComponent} from 'yourbank-design'
 
 
 
 function App() {
   return (
     <div className="App">
-      
+      <Header>
+        
+      </Header>
       <Container>
       <Container 
       useCardStyle={true}

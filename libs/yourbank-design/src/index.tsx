@@ -1,6 +1,19 @@
 import * as React from 'react'
 import styles from './styles.module.css'
 
+//header
+
+const Header: React.FC = () => {
+  return (
+    <header className={styles.header}>
+      <h1 className={styles.logo}>YourBank</h1>
+      {/* Add navigation or other elements here */}
+    </header>
+  )
+}
+
+export default Header
+
 // Button
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary'
