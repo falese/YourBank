@@ -36,6 +36,9 @@ jobs:
 
       - name: Build design system library
         run: yarn workspace yourbank-design build
+        env:
+          # microbundle-crl uses webpack internally — same Node 18 OpenSSL fix needed
+          NODE_OPTIONS: --openssl-legacy-provider
 
       - name: Build example app
         working-directory: libs/yourbank-design/example
