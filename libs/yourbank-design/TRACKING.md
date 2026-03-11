@@ -1,7 +1,7 @@
-# YourBank Tracking Observer — Spec & Schema Guide
+# YourBank Tracking Observer — Spec & Schema Guide (v2)
 
 This document describes how the `TrackingObserver` works, how to define the
-blocking schema, and how the Adobe Web SDK integrates with custom events.
+schema, and how analytics vendors integrate with custom events.
 
 ---
 
@@ -10,57 +10,113 @@ blocking schema, and how the Adobe Web SDK integrates with custom events.
 The `TrackingObserver` is a framework-agnostic class exported from
 `yourbank-design`. It:
 
-1. **Reads a schema** that declares which form fields are excluded from tracking
-2. **Stamps blocked fields** with `data-tracking-blocked="true"` via a
-   `MutationObserver` so Adobe SDK rules can natively filter them
-3. **Delegates events** (input, change, focus, blur, click, submit) at the
-   document level and drops events from blocked elements
-4. **Dispatches custom DOM events** (`yourbank:*`) that Adobe SDK rules listen
-   to — no changes to UI components required
+1. **Reads a schema** that declares which fields are blocked and how tracked fields should be enriched
+2. **Stamps blocked fields** with `data-tracking-blocked="true"` via a `MutationObserver` so vendor rules can natively filter them
+3. **Resolves component types** — derives a semantic type string (`input:text`, `button:submit`, etc.) for every event
+4. **Enriches event payloads** — merges static metadata from `schema.fieldMap` into events for matching fields
+5. **Filters events by component type** — only fires meaningful events per type (e.g. text inputs don't fire per-keystroke `input` events by default)
+6. **Dispatches custom DOM events** (`yourbank:*`) that any vendor can listen to — no changes to UI components required
+
+---
+
+## Architecture
+
+```
+  DOM Events (input / change / focus / blur / click / submit)
+         │  capture phase, single listener on document
+         ▼
+  ┌────────────────────────────────────────────────┐
+  │              TrackingObserver                  │
+  │                                                │
+  │  1. isBlocked?           → drop               │  ← schema.blockedFields
+  │  2. resolveComponentType()                     │  ← tag + type + data-component
+  │  3. input:hidden?        → drop               │
+  │  4. eventAllowed?        → drop if not        │  ← fieldMap.events || defaults
+  │  5. findFieldMeta()                            │  ← schema.fieldMap
+  │  6. dispatchCustomEvent()                      │
+  └─────────────────┬──────────────────────────────┘
+                    │  document.dispatchEvent(CustomEvent)
+                    │
+         ┌──────────┼──────────┬─────────────┐
+         ▼          ▼          ▼             ▼
+      Adobe        GA4      Segment      Any Vendor
+     (Launch)    (gtag)   (analytics)    (external listener)
+```
 
 ---
 
 ## Schema Definition
 
 The schema is a plain TypeScript/JavaScript object (or a parsed JSON file)
-conforming to the `TrackingSchema` interface exported from `yourbank-design`:
+conforming to the `TrackingSchema` interface exported from `yourbank-design`.
+
+### v1 — blockedFields only (still works)
 
 ```ts
 import type { TrackingSchema } from 'yourbank-design'
 
 const schema: TrackingSchema = {
   version: '1.0.0',
-  description: '…',
   eventPrefix: 'yourbank:',
   blockedFields: [
-    {
-      selector: "[data-field-id='ssn']",
-      reason: 'Social Security Number is sensitive PII',
-      category: 'sensitive_pii'
-    }
-    // …
+    { selector: "[data-field-id='ssn']", reason: 'SSN is sensitive PII', category: 'sensitive_pii' }
   ]
 }
 ```
 
-### `TrackingSchema` fields
+### v2 — blockedFields + fieldMap
 
-| Field          | Type            | Description |
-|----------------|-----------------|-------------|
-| `version`      | `string`        | Semantic version of the schema document |
-| `description`  | `string`        | Optional human-readable description |
-| `eventPrefix`  | `string`        | Prefix for all custom DOM events (`"yourbank:"`) |
-| `blockedFields`| `BlockedField[]`| List of field exclusion rules |
+```ts
+import type { TrackingSchema } from 'yourbank-design'
 
-### `BlockedField` fields
+const schema: TrackingSchema = {
+  version: '2.0.0',
+  eventPrefix: 'yourbank:',
+
+  blockedFields: [
+    { selector: "[data-field-id='ssn']",      reason: 'SSN',           category: 'sensitive_pii' },
+    { selector: "[type='password']",           reason: 'Password',      category: 'credential'    },
+    { selector: "[data-field-id='dob']",       reason: 'Date of birth', category: 'sensitive_pii' },
+    { selector: "[data-field-id='account-number']", reason: 'Account #', category: 'financial'   }
+  ],
+
+  fieldMap: [
+    {
+      selector: "[data-field-id='email']",
+      meta: { section: 'contact-info', label: 'Email Address', required: true, step: 1 }
+    },
+    {
+      selector: "[data-field-id='loan-amount']",
+      meta: { section: 'loan-details', label: 'Requested Amount', step: 2 },
+      events: ['change', 'blur']   // suppress focus events
+    }
+  ]
+}
+```
+
+---
+
+## TrackingSchema fields
+
+| Field          | Type              | Required | Description |
+|----------------|-------------------|----------|-------------|
+| `version`      | `string`          | yes      | Semantic version of the schema document |
+| `description`  | `string`          | no       | Optional human-readable description |
+| `eventPrefix`  | `string`          | yes      | Prefix for all custom DOM events (`"yourbank:"`) |
+| `blockedFields`| `BlockedField[]`  | yes      | Fields that must NEVER generate events |
+| `fieldMap`     | `FieldDefinition[]` | no     | Per-field enrichment metadata (v2) |
+
+---
+
+## BlockedField fields
 
 | Field      | Type                   | Description |
 |------------|------------------------|-------------|
 | `selector` | `string`               | CSS selector identifying the element(s) to block |
-| `reason`   | `string`               | Why this field is excluded (for audit trail) |
-| `category` | `BlockedFieldCategory` | Data sensitivity category (see below) |
+| `reason`   | `string`               | Why this field is excluded (audit trail) |
+| `category` | `BlockedFieldCategory` | Data sensitivity category |
 
-### `BlockedFieldCategory` values
+### BlockedFieldCategory values
 
 | Value           | When to use |
 |-----------------|-------------|
@@ -71,41 +127,59 @@ const schema: TrackingSchema = {
 
 ---
 
-## Field Identification Convention
+## FieldDefinition fields (v2)
 
-Fields are identified by the **`data-field-id` attribute** placed on the HTML
-element. This is the recommended convention for this codebase:
-
-```html
-<!-- TRACKED — no entry in blockedFields -->
-<input type="text" data-field-id="first-name" />
-<input type="email" data-field-id="email" />
-<input type="number" data-field-id="loan-amount" />
-
-<!-- BLOCKED — matches a blockedFields selector -->
-<input type="password" data-field-id="ssn" />
-<input type="date"     data-field-id="dob" />
-<input type="password" data-field-id="account-number" />
-```
-
-The UI component code does **not** need to import the schema or know about
-Adobe. The `data-field-id` attribute is the only contract between the component
-and the tracking system.
+| Field      | Type | Required | Description |
+|------------|------|----------|-------------|
+| `selector` | `string` | yes | CSS selector — same convention as blockedFields |
+| `meta`     | `Record<string, string \| number \| boolean>` | yes | Merged into `event.detail.meta` |
+| `events`   | `Array<'input'\|'change'\|'focus'\|'blur'\|'click'\|'submit'>` | no | Override default events for this field |
 
 ---
 
-## Blocked Fields — Quick Reference
+## Component Type Taxonomy (v2)
 
-The example app's schema (`example/src/tracking-schema.ts`) blocks:
+Every event payload includes a `componentType` string. Resolution order:
+1. `data-component` attribute (explicit override)
+2. Derived from `tagName` + `type` attribute
 
-| `data-field-id`  | Category        | Reason |
-|------------------|-----------------|--------|
-| `ssn`            | `sensitive_pii` | Social Security Number |
-| `password`       | `credential`    | Login / account password |
-| `dob`            | `sensitive_pii` | Date of birth (CCPA / GDPR) |
-| `account-number` | `financial`     | Bank account number |
+| Element | type attr | componentType | Default events |
+|---|---|---|---|
+| `<input>` | text / email / tel / search / url | `input:text` | focus, blur, change |
+| `<input>` | password | `input:password` | (always blocked) |
+| `<input>` | checkbox | `input:checkbox` | change |
+| `<input>` | radio | `input:radio` | change |
+| `<input>` | number | `input:number` | focus, blur, change |
+| `<input>` | hidden | `input:hidden` | **(never fires)** |
+| `<input>` | date / datetime-local | `input:date` | change, blur |
+| `<button>` | submit | `button:submit` | click |
+| `<button>` | button | `button:button` | click |
+| `<button>` | reset | `button:reset` | click |
+| `<select>` | — | `select` | change, focus, blur |
+| `<textarea>` | — | `textarea` | focus, blur, change |
+| `<a>` | — | `link` | click |
+| `<form>` | — | `form` | submit |
 
-All other `data-field-id` values are **tracked by default**.
+---
+
+## Field Identification Convention
+
+Fields are identified by the **`data-field-id` attribute**:
+
+```html
+<!-- TRACKED — will fire events with meta from fieldMap -->
+<input type="text"  data-field-id="first-name" />
+<input type="email" data-field-id="email" />
+<select             data-field-id="loan-purpose" />
+
+<!-- BLOCKED — observer stamps these, no events ever fire -->
+<input type="text"     data-field-id="ssn" />
+<input type="date"     data-field-id="dob" />
+<input type="password" data-field-id="password" />
+```
+
+UI components do **not** need to import the schema. The `data-field-id`
+attribute is the only contract between the component and the tracking system.
 
 ---
 
@@ -119,18 +193,9 @@ After `observer.start()` runs, every blocked element receives:
 | `data-tracking-block-reason`    | The `reason` string from the schema |
 | `data-tracking-block-category`  | The `category` string from the schema |
 
-These attributes can be used:
-- By Adobe SDK rules as conditions (e.g. "Attribute `data-tracking-blocked`
-  does not equal `true`")
-- By CSS to add a visual indicator in development/QA builds
-- By automated accessibility or privacy audits
-
 ---
 
 ## Custom Events Dispatched
-
-The observer dispatches `CustomEvent`s on `document`. All events are prefixed
-with `eventPrefix` from the schema (default `"yourbank:"`).
 
 ### `yourbank:pageView`
 
@@ -139,24 +204,26 @@ Fired when `observer.setPage(pageName)` is called.
 ```ts
 detail: {
   eventType: 'pageView',
-  pageName: string,
+  pageName:  string,
   timestamp: string   // ISO-8601
 }
 ```
 
 ### `yourbank:fieldInteraction`
 
-Fired on `input`, `change`, `focus`, `blur` events on **non-blocked** fields.
+Fired on allowed events for **non-blocked** fields.
 
 ```ts
 detail: {
-  eventType: 'input' | 'change' | 'focus' | 'blur',
-  fieldId?: string,    // data-field-id value
-  fieldType?: string,  // <input type="...">
-  pageName?: string,
-  timestamp: string,
-  elementTag: string   // "input" | "textarea" | "select"
-  // NOTE: field *values* are never included
+  eventType:     'input' | 'change' | 'focus' | 'blur' | 'click',
+  fieldId?:      string,    // data-field-id value
+  fieldType?:    string,    // <input type="...">
+  pageName?:     string,
+  timestamp:     string,
+  elementTag:    string,    // "input" | "textarea" | "select" | "button"
+  elementText?:  string,    // buttons/links only — input values never captured
+  componentType?: string,   // v2: "input:text", "button:submit", etc.
+  meta?:         Record<string, string | number | boolean>  // v2: from fieldMap
 }
 ```
 
@@ -166,32 +233,56 @@ Fired on form `submit` events where the form is **not** blocked.
 
 ```ts
 detail: {
-  eventType: 'submit',
-  fieldId?: string,    // form id or data-form-id
-  pageName?: string,
-  timestamp: string,
-  elementTag: 'form'
+  eventType:      'submit',
+  fieldId?:       string,   // form id or data-form-id
+  pageName?:      string,
+  timestamp:      string,
+  elementTag:     'form',
+  componentType?: 'form'
 }
 ```
 
 ---
 
-## Adobe Web SDK Integration
+## Vendor Integration
 
-In Adobe Experience Platform Data Collection (Launch / Tags), create rules like:
+### Adobe Web SDK (Launch / Tags)
+
+Create rules in Adobe Experience Platform Data Collection:
 
 **Rule: Track field interaction**
 - Event: Custom Event — `yourbank:fieldInteraction`
 - Condition: Element Attribute `data-tracking-blocked` does not equal `true`
-- Action: Send Beacon — Analytics (pass `event.detail` as context data)
+- Action: Send Beacon — pass `event.detail` + `event.detail.meta` as context data
 
 **Rule: Track page view**
 - Event: Custom Event — `yourbank:pageView`
 - Action: Send Beacon — Page View
 
-**Rule: Track form submit**
-- Event: Custom Event — `yourbank:formSubmit`
-- Action: Send Beacon — Analytics
+### Google Analytics 4
+
+```js
+document.addEventListener('yourbank:fieldInteraction', e => {
+  gtag('event', e.detail.componentType, {
+    field_id:   e.detail.fieldId,
+    page:       e.detail.pageName,
+    section:    e.detail.meta?.section,
+    label:      e.detail.meta?.label,
+    event_type: e.detail.eventType
+  })
+})
+```
+
+### Segment
+
+```js
+document.addEventListener('yourbank:fieldInteraction', e => {
+  analytics.track('Field Interaction', {
+    ...e.detail,
+    ...e.detail.meta
+  })
+})
+```
 
 ---
 
@@ -201,17 +292,26 @@ In Adobe Experience Platform Data Collection (Launch / Tags), create rules like:
 import { TrackingObserver } from 'yourbank-design'
 import schema from './tracking-schema'
 
-// Typically in your app root component (e.g. index.tsx / App.tsx)
 const observer = new TrackingObserver(schema)
 observer.start()
 observer.setPage('landing')
 
-// When navigating to a new view
+// SPA navigation
 observer.setPage('loan-application')
 
-// On unmount
+// Unmount
 observer.stop()
 ```
+
+---
+
+## Privacy Guarantees
+
+1. **Field values are never captured** — `el.value` is never read or included in any payload
+2. **`input:hidden` never fires** — filtered at component type resolution
+3. **Password fields are always blocked** — `[type="password"]` is covered by blockedFields
+4. **Blocked ancestor propagation** — if any parent element is blocked, all child events are dropped
+5. **`data-tracking-blocked` stamp** — applied to DOM for belt-and-suspenders vendor filtering
 
 ---
 

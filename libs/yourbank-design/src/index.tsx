@@ -7,6 +7,7 @@ export type {
   TrackingSchema,
   BlockedField,
   BlockedFieldCategory,
+  FieldDefinition,
   TrackingEventDetail
 } from './tracking/types'
 

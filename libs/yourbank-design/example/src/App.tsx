@@ -4,13 +4,16 @@
  * Demonstrates:
  *  1. Form with editable fields and a submit button
  *  2. Navigation between views (Landing → Application → Confirmation)
- *  3. A DOM observer (TrackingObserver) that dispatches custom events the
- *     Adobe Web SDK can listen to
- *  4. A schema (tracking-schema.ts) that blocks specific sensitive fields from
- *     being tracked — without any changes to the form components themselves
+ *  3. A DOM observer (TrackingObserver) that dispatches custom events that
+ *     any analytics vendor can listen to
+ *  4. A schema (tracking-schema.ts) that:
+ *     - Blocks specific sensitive fields from being tracked (v1)
+ *     - Enriches tracked field events with business metadata (v2)
+ *  5. An Architecture page explaining the full system design
  *
- * The "Adobe SDK Event Console" panel at the bottom simulates what the real
- * Adobe Web SDK would receive when its rules listen to `yourbank:*` events.
+ * The "Analytics Event Console" panel at the bottom simulates what any
+ * vendor (Adobe, GA4, Segment) would receive when listening to `yourbank:*`
+ * custom events on document.
  */
 
 import React, { useState, useEffect, useCallback, useRef } from 'react'
@@ -21,10 +24,11 @@ import trackingSchema from './tracking-schema'
 import LandingPage from './pages/LandingPage'
 import ApplicationPage, { ApplicationFormData } from './pages/ApplicationPage'
 import ConfirmationPage from './pages/ConfirmationPage'
+import ArchitecturePage from './pages/ArchitecturePage'
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
-type Page = 'landing' | 'application' | 'confirmation'
+type Page = 'landing' | 'application' | 'confirmation' | 'architecture'
 
 interface EventLogEntry {
   id: number
@@ -33,17 +37,13 @@ interface EventLogEntry {
   blocked: boolean
 }
 
-// ─── Mock Adobe SDK ─────────────────────────────────────────────────────────
+// ─── Analytics vendor simulator ─────────────────────────────────────────────
 //
-// In a real deployment the Adobe Web SDK (alloy.js) is loaded separately and
-// configured via Adobe Experience Platform Data Collection (Launch/Tags).
-// SDK rules listen for custom events like `yourbank:fieldInteraction` and
-// fire send-beacon / analytics actions.
-//
-// Here we register the same event listeners a typical Launch rule would use,
-// and surface them in the on-page debug console below.
+// In a real deployment vendor SDKs (Adobe alloy.js, gtag.js, analytics.js) are
+// loaded separately. Each vendor registers its own document event listeners.
+// Here we simulate what any vendor would receive from the custom events.
 
-function createAdobeSDKSimulator(
+function createVendorSimulator(
   onEvent: (entry: Omit<EventLogEntry, 'id'>) => void
 ) {
   const prefix = trackingSchema.eventPrefix // 'yourbank:'
@@ -89,8 +89,8 @@ const App: React.FC = () => {
     observer.start()
     observerRef.current = observer
 
-    // Adobe SDK simulation — only sees events that passed through the observer
-    const cleanup = createAdobeSDKSimulator(addEvent)
+    // Vendor simulation — only sees events that passed through the observer
+    const cleanup = createVendorSimulator(addEvent)
 
     return () => {
       observer.stop()
@@ -98,7 +98,7 @@ const App: React.FC = () => {
     }
   }, [addEvent])
 
-  // Announce page changes to the observer so Adobe SDK rules get page context
+  // Announce page changes to the observer so vendor rules get page context
   useEffect(() => {
     observerRef.current?.setPage(page)
   }, [page])
@@ -133,6 +133,13 @@ const App: React.FC = () => {
             Confirmation
           </button>
         )}
+        <button
+          className={page === 'architecture' ? 'active' : ''}
+          onClick={() => navigateTo('architecture')}
+          style={{ marginLeft: 'auto' }}
+        >
+          Architecture
+        </button>
       </Header>
 
       <main>
@@ -151,9 +158,10 @@ const App: React.FC = () => {
             onBack={() => navigateTo('landing')}
           />
         )}
+        {page === 'architecture' && <ArchitecturePage />}
       </main>
 
-      {/* ── Adobe SDK Event Console ──────────────────────────────────────── */}
+      {/* ── Analytics Event Console ──────────────────────────────────────── */}
       <div
         style={{
           position: 'fixed',
@@ -188,9 +196,9 @@ const App: React.FC = () => {
         >
           <span>
             <span style={{ color: '#c0392b', fontWeight: 700 }}>●</span>{' '}
-            Adobe Web SDK Event Console{' '}
+            Analytics Event Console{' '}
             <span style={{ color: '#888', fontSize: 11 }}>
-              (simulated — only non-blocked fields appear here)
+              (simulated vendor listener — blocked fields never appear)
             </span>
           </span>
           <span style={{ color: '#888' }}>
@@ -200,13 +208,7 @@ const App: React.FC = () => {
         </div>
 
         {/* Event log */}
-        <div
-          style={{
-            overflowY: 'auto',
-            flex: 1,
-            padding: '4px 0'
-          }}
-        >
+        <div style={{ overflowY: 'auto', flex: 1, padding: '4px 0' }}>
           {eventLog.length === 0 && (
             <div style={{ padding: '12px 16px', color: '#666' }}>
               Interact with the form to see tracking events…
@@ -236,16 +238,31 @@ const EVENT_COLORS: Record<string, string> = {
   formSubmit: '#dcdcaa'
 }
 
+const COMPONENT_TYPE_COLORS: Record<string, string> = {
+  'input:text':     '#ce9178',
+  'input:checkbox': '#b5cea8',
+  'input:number':   '#b5cea8',
+  'input:date':     '#b5cea8',
+  'button:submit':  '#dcdcaa',
+  'button:button':  '#d7ba7d',
+  'select':         '#9cdcfe',
+  'textarea':       '#ce9178',
+  'link':           '#569cd6',
+  'form':           '#dcdcaa'
+}
+
 const EventRow: React.FC<EventRowProps> = ({ entry }) => {
   const [expanded, setExpanded] = useState(false)
   const color = EVENT_COLORS[entry.eventName] ?? '#ce9178'
   const d = entry.detail
+  const ctColor = d.componentType ? (COMPONENT_TYPE_COLORS[d.componentType] ?? '#d4d4d4') : '#d4d4d4'
 
   const summary = [
+    d.componentType && `[${d.componentType}]`,
     d.fieldId && `fieldId="${d.fieldId}"`,
-    d.fieldType && `type="${d.fieldType}"`,
     d.pageName && `page="${d.pageName}"`,
-    d.elementText && `text="${d.elementText}"`
+    d.elementText && `text="${d.elementText}"`,
+    d.meta?.section && `section="${d.meta.section}"`
   ]
     .filter(Boolean)
     .join('  ')
@@ -264,6 +281,11 @@ const EventRow: React.FC<EventRowProps> = ({ entry }) => {
         {d.timestamp ? d.timestamp.slice(11, 23) : ''}
       </span>
       <span style={{ color, fontWeight: 600 }}>{entry.eventName}</span>
+      {d.componentType && (
+        <span style={{ color: ctColor, marginLeft: 8, fontSize: 11 }}>
+          {d.componentType}
+        </span>
+      )}
       {summary && (
         <span style={{ color: '#d4d4d4', marginLeft: 12 }}>{summary}</span>
       )}

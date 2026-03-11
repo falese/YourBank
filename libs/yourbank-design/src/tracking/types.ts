@@ -19,6 +19,32 @@
  * TrackingObserver applies blocking transparently via DOM observation.
  */
 
+/**
+ * A single field enrichment rule.
+ * Maps a CSS selector to static metadata merged into every event for that field.
+ */
+export interface FieldDefinition {
+  /**
+   * CSS selector identifying the field.
+   * Same convention as blockedFields — data-field-id recommended.
+   */
+  selector: string
+
+  /**
+   * Arbitrary key/value pairs merged into event.detail.meta for this field.
+   * Use for business context: section, label, step, required, flow, etc.
+   * Values must be JSON-serializable primitives.
+   */
+  meta: Record<string, string | number | boolean>
+
+  /**
+   * Restrict which DOM event types generate tracking events for this field.
+   * Omit to use the observer's default event set for the component type.
+   * Example: ['change', 'blur'] — avoid per-keystroke noise on text fields.
+   */
+  events?: Array<'input' | 'change' | 'focus' | 'blur' | 'click' | 'submit'>
+}
+
 /** Categories of sensitive data that should be excluded from tracking */
 export type BlockedFieldCategory =
   | 'sensitive_pii'  // Social Security Number, date of birth, government IDs
@@ -68,6 +94,14 @@ export interface TrackingSchema {
    * Example: "yourbank:"
    */
   eventPrefix: string
+
+  /**
+   * Optional per-field enrichment rules.
+   * Each entry maps a CSS selector to static metadata merged into event payloads.
+   * Also supports per-field event filtering via the `events` property.
+   * V1 schemas without fieldMap continue to work — meta and componentType will be undefined.
+   */
+  fieldMap?: FieldDefinition[]
 }
 
 /** Payload attached to every custom tracking event's `detail` property */
@@ -95,4 +129,18 @@ export interface TrackingEventDetail {
    * Input field *values* are never captured.
    */
   elementText?: string
+
+  /**
+   * Design system component type resolved from the element.
+   * Format: "tag:subtype" e.g. "input:text", "button:submit", "select".
+   * Derived from tagName + type attribute, overridable via data-component attribute.
+   */
+  componentType?: string
+
+  /**
+   * Static metadata from the schema's fieldMap for this field.
+   * Contains business context: section, label, step, required, flow, etc.
+   * Only present when the field has a matching FieldDefinition in the schema.
+   */
+  meta?: Record<string, string | number | boolean>
 }
