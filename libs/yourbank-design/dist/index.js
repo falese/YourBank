@@ -27,16 +27,19 @@ function _objectWithoutPropertiesLoose(source, excluded) {
   return target;
 }
 
-var styles = {"header":"_1aDvk","logo":"_Lw2P8","container":"_1Lxpd","cardContainer":"_2PVO1","background":"_38Bir","button":"_2hTXI","table":"_FnYjQ","table-striped":"_3NyrT","card":"_xsi02","cardHeader":"_2cQtw","headerContent":"_oI8tQ","cardTitle":"_2yKGs","underHeaderIcon":"_TN3it","cardContent":"_2ZnC8","cardFooter":"_2PuQp","icon":"_2Vept","icon-red":"_EipcL","icon-white":"_2MHdX"};
+var styles = {"header":"_1aDvk","logo":"_Lw2P8","container":"_1Lxpd","cardContainer":"_2PVO1","background":"_38Bir","button":"_2hTXI","table":"_FnYjQ","table-striped":"_3NyrT","card":"_xsi02","cardHeader":"_2cQtw","headerContent":"_oI8tQ","cardTitle":"_2yKGs","underHeaderIcon":"_TN3it","cardContent":"_2ZnC8","cardFooter":"_2PuQp","icon":"_2Vept","icon-red":"_EipcL","icon-white":"_2MHdX","headerNav":"_3xKp7","secondary":"_2Rwxs","formGroup":"_1nBvT","label":"_3kJfL","requiredMark":"_2yMp0","input":"_1pXuK","formRow":"_3cNsD","formSection":"_2oKlP","formSectionTitle":"_1xMrs"};
 
 var _excluded = ["variant", "children"],
-  _excluded2 = ["headerIcon", "headerTitle", "footer", "children", "underHeaderIcon"];
-var Header = function Header() {
-  return React.createElement("header", {
-    className: styles.header
-  }, React.createElement("h1", {
-    className: styles.logo
-  }, "YourBank"));
+  _excluded2 = ["headerIcon", "headerTitle", "footer", "children", "underHeaderIcon"],
+  _excluded3 = ["required", "children"],
+  _excluded4 = ["children", "className"];
+var Header = function Header(_ref0) {
+  var children = _ref0.children,
+    props = _objectWithoutPropertiesLoose(_ref0, ["children"]);
+  return React.createElement("header", Object.assign({ className: styles.header }, props),
+    React.createElement("h1", { className: styles.logo }, "YourBank"),
+    children && React.createElement("div", { className: styles.headerNav }, children)
+  );
 };
 var Button = function Button(_ref) {
   var _ref$variant = _ref.variant,
@@ -147,11 +150,239 @@ var LogoComponent = function LogoComponent(_ref6) {
   }));
 };
 
+// ─── Form components ──────────────────────────────────────────────────────────
+
+var Input = function Input(props) {
+  return React.createElement("input", Object.assign({ className: styles.input }, props));
+};
+
+var Select = function Select(_ref_s) {
+  var children = _ref_s.children,
+    props = _objectWithoutPropertiesLoose(_ref_s, ["children"]);
+  return React.createElement("select", Object.assign({ className: styles.input }, props), children);
+};
+
+var Label = function Label(_ref_l) {
+  var required = _ref_l.required,
+    children = _ref_l.children,
+    props = _objectWithoutPropertiesLoose(_ref_l, _excluded3);
+  return React.createElement("label", Object.assign({ className: styles.label }, props),
+    children,
+    required && React.createElement("span", { className: styles.requiredMark, "aria-hidden": "true" }, " *")
+  );
+};
+
+var FormGroup = function FormGroup(_ref_fg) {
+  var children = _ref_fg.children,
+    className = _ref_fg.className,
+    props = _objectWithoutPropertiesLoose(_ref_fg, _excluded4);
+  return React.createElement("div", Object.assign({ className: styles.formGroup + (className ? " " + className : "") }, props), children);
+};
+
+// ─── TrackingObserver ─────────────────────────────────────────────────────────
+
+var TrackingObserver = (function () {
+  function TrackingObserver(schema) {
+    this.mutationObserver = null;
+    this.currentPage = '';
+    this.listening = false;
+    this.schema = schema;
+    this.handleEvent = this._handleEvent.bind(this);
+  }
+
+  TrackingObserver.prototype.setPage = function (pageName) {
+    this.currentPage = pageName;
+    this._dispatch('pageView', {
+      eventType: 'pageView',
+      pageName: pageName,
+      timestamp: new Date().toISOString()
+    });
+  };
+
+  TrackingObserver.prototype.start = function () {
+    if (this.listening) return;
+    this.listening = true;
+    var self = this;
+    var events = ['input', 'change', 'focus', 'blur', 'click', 'submit'];
+    events.forEach(function (type) {
+      document.addEventListener(type, self.handleEvent, true);
+    });
+    this.mutationObserver = new MutationObserver(function (mutations) {
+      mutations.forEach(function (mutation) {
+        mutation.addedNodes.forEach(function (node) {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            self._stampBlocked(node);
+          }
+        });
+      });
+    });
+    this.mutationObserver.observe(document.body, { childList: true, subtree: true });
+    this._stampBlocked(document.body);
+  };
+
+  TrackingObserver.prototype.stop = function () {
+    if (!this.listening) return;
+    this.listening = false;
+    var self = this;
+    var events = ['input', 'change', 'focus', 'blur', 'click', 'submit'];
+    events.forEach(function (type) {
+      document.removeEventListener(type, self.handleEvent, true);
+    });
+    if (this.mutationObserver) {
+      this.mutationObserver.disconnect();
+      this.mutationObserver = null;
+    }
+  };
+
+  TrackingObserver.prototype._stampBlocked = function (root) {
+    var blockedFields = this.schema.blockedFields;
+    for (var i = 0; i < blockedFields.length; i++) {
+      var rule = blockedFields[i];
+      try {
+        root.querySelectorAll(rule.selector).forEach(function (el) {
+          el.setAttribute('data-tracking-blocked', 'true');
+          el.setAttribute('data-tracking-block-reason', rule.reason);
+          el.setAttribute('data-tracking-block-category', rule.category);
+        });
+        if (root.matches && root.matches(rule.selector)) {
+          root.setAttribute('data-tracking-blocked', 'true');
+          root.setAttribute('data-tracking-block-reason', rule.reason);
+          root.setAttribute('data-tracking-block-category', rule.category);
+        }
+      } catch (e) {
+        // Tolerate invalid selectors
+      }
+    }
+  };
+
+  TrackingObserver.prototype._isBlocked = function (element) {
+    var node = element;
+    var blockedFields = this.schema.blockedFields;
+    while (node) {
+      if (node.getAttribute('data-tracking-blocked') === 'true') return true;
+      for (var i = 0; i < blockedFields.length; i++) {
+        try {
+          if (node.matches(blockedFields[i].selector)) return true;
+        } catch (e) {
+          // ignore
+        }
+      }
+      node = node.parentElement;
+    }
+    return false;
+  };
+
+  TrackingObserver.prototype._resolveComponentType = function (el) {
+    var override = el.getAttribute('data-component');
+    if (override) return override;
+    var tag = el.tagName.toUpperCase();
+    var type = (el.type || '').toLowerCase();
+    if (tag === 'INPUT') {
+      if (['text', 'email', 'tel', 'search', 'url'].indexOf(type) >= 0) return 'input:text';
+      if (type === 'password') return 'input:password';
+      if (type === 'checkbox') return 'input:checkbox';
+      if (type === 'radio') return 'input:radio';
+      if (type === 'number') return 'input:number';
+      if (type === 'hidden') return 'input:hidden';
+      if (['date', 'datetime-local', 'month', 'week', 'time'].indexOf(type) >= 0) return 'input:date';
+      return 'input:' + (type || 'text');
+    }
+    if (tag === 'BUTTON') {
+      if (type === 'submit') return 'button:submit';
+      if (type === 'reset') return 'button:reset';
+      return 'button:button';
+    }
+    if (tag === 'SELECT') return 'select';
+    if (tag === 'TEXTAREA') return 'textarea';
+    if (tag === 'A') return 'link';
+    if (tag === 'FORM') return 'form';
+    return tag.toLowerCase();
+  };
+
+  TrackingObserver.prototype._getDefaultEvents = function (componentType) {
+    if (componentType === 'input:hidden') return [];
+    if (componentType === 'input:checkbox' || componentType === 'input:radio') return ['change'];
+    if (componentType === 'input:date') return ['change', 'blur'];
+    if (componentType.indexOf('input:') === 0 || componentType === 'textarea') return ['focus', 'blur', 'change'];
+    if (componentType.indexOf('button:') === 0 || componentType === 'link') return ['click'];
+    if (componentType === 'select') return ['change', 'focus', 'blur'];
+    if (componentType === 'form') return ['submit'];
+    return ['click', 'change', 'blur'];
+  };
+
+  TrackingObserver.prototype._findFieldMeta = function (el) {
+    if (!this.schema.fieldMap) return undefined;
+    for (var i = 0; i < this.schema.fieldMap.length; i++) {
+      var def = this.schema.fieldMap[i];
+      try {
+        if (el.matches(def.selector)) {
+          return { meta: def.meta, events: def.events };
+        }
+      } catch (e) {
+        // ignore invalid selectors
+      }
+    }
+    return undefined;
+  };
+
+  TrackingObserver.prototype._handleEvent = function (event) {
+    var target = event.target;
+    if (!target || !target.tagName) return;
+    var tag = target.tagName.toUpperCase();
+    var isField = ['INPUT', 'TEXTAREA', 'SELECT'].indexOf(tag) >= 0;
+    var isButton = tag === 'BUTTON';
+    var isAnchor = tag === 'A';
+    var isForm = tag === 'FORM';
+    if (['input', 'change', 'focus', 'blur'].indexOf(event.type) >= 0 && !isField) return;
+    if (event.type === 'submit' && !isForm) return;
+    if (event.type === 'click' && !isButton && !isAnchor && !(target.dataset && target.dataset.trackClick)) return;
+    if (this._isBlocked(target)) return;
+    var componentType = this._resolveComponentType(target);
+    if (componentType === 'input:hidden') return;
+    var fieldDef = this._findFieldMeta(target);
+    var allowedEvents = (fieldDef && fieldDef.events) ? fieldDef.events : this._getDefaultEvents(componentType);
+    if (allowedEvents.indexOf(event.type) < 0) return;
+    var detail = {
+      eventType: event.type,
+      timestamp: new Date().toISOString(),
+      pageName: this.currentPage,
+      fieldId: target.dataset ? target.dataset.fieldId : undefined,
+      fieldType: isField ? target.type : undefined,
+      elementTag: tag.toLowerCase(),
+      componentType: componentType
+    };
+    if (fieldDef && fieldDef.meta) {
+      detail.meta = fieldDef.meta;
+    }
+    if (isButton || isAnchor) {
+      detail.elementText = target.textContent ? target.textContent.trim() : undefined;
+    }
+    if (isForm) {
+      detail.fieldId = target.id || (target.dataset && target.dataset.formId);
+      this._dispatch('formSubmit', detail);
+    } else {
+      this._dispatch('fieldInteraction', detail);
+    }
+  };
+
+  TrackingObserver.prototype._dispatch = function (name, detail) {
+    var type = this.schema.eventPrefix + name;
+    document.dispatchEvent(new CustomEvent(type, { bubbles: true, detail: detail }));
+  };
+
+  return TrackingObserver;
+}());
+
 exports.Button = Button;
 exports.Card = Card;
 exports.Container = Container;
+exports.FormGroup = FormGroup;
 exports.Icon = Icon;
+exports.Input = Input;
+exports.Label = Label;
 exports.LogoComponent = LogoComponent;
+exports.Select = Select;
 exports.Table = Table;
+exports.TrackingObserver = TrackingObserver;
 exports.default = Header;
 //# sourceMappingURL=index.js.map
