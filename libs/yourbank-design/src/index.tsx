@@ -1,13 +1,27 @@
 import * as React from 'react'
 import styles from './styles.module.css'
 
-//header
+// Tracking
+export { TrackingObserver } from './tracking/TrackingObserver'
+export type {
+  TrackingSchema,
+  BlockedField,
+  BlockedFieldCategory,
+  FieldDefinition,
+  TrackingEventDetail
+} from './tracking/types'
 
-const Header: React.FC = () => {
+// Header
+
+interface HeaderProps extends React.HTMLAttributes<HTMLElement> {
+  children?: React.ReactNode
+}
+
+const Header: React.FC<HeaderProps> = ({ children, ...props }) => {
   return (
-    <header className={styles.header}>
+    <header className={styles.header} {...props}>
       <h1 className={styles.logo}>YourBank</h1>
-      {/* Add navigation or other elements here */}
+      {children && <div className={styles.headerNav}>{children}</div>}
     </header>
   )
 }
@@ -187,3 +201,60 @@ export const LogoComponent: React.FC<LogoProps> = ({ className, style }) => {
     </svg>
   )
 }
+
+// ─── Form components ──────────────────────────────────────────────────────────
+// These components are thin, accessible wrappers around standard HTML elements.
+// They accept all native HTML attributes — including `data-field-id` — which
+// is the convention the TrackingObserver uses to identify fields in the schema.
+
+export interface InputProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {
+  /** Identifies this field in the tracking schema. E.g. data-field-id="email" */
+  'data-field-id'?: string
+}
+
+export const Input: React.FC<InputProps> = (props) => (
+  <input className={styles.input} {...props} />
+)
+
+export interface SelectProps
+  extends React.SelectHTMLAttributes<HTMLSelectElement> {
+  'data-field-id'?: string
+  children: React.ReactNode
+}
+
+export const Select: React.FC<SelectProps> = ({ children, ...props }) => (
+  <select className={styles.input} {...props}>
+    {children}
+  </select>
+)
+
+export interface LabelProps
+  extends React.LabelHTMLAttributes<HTMLLabelElement> {
+  required?: boolean
+}
+
+export const Label: React.FC<LabelProps> = ({
+  required,
+  children,
+  ...props
+}) => (
+  <label className={styles.label} {...props}>
+    {children}
+    {required && (
+      <span className={styles.requiredMark} aria-hidden='true'>
+        {' '}
+        *
+      </span>
+    )}
+  </label>
+)
+
+interface FormGroupProps {
+  children: React.ReactNode
+  className?: string
+}
+
+export const FormGroup: React.FC<FormGroupProps> = ({ children, className }) => (
+  <div className={`${styles.formGroup} ${className || ''}`}>{children}</div>
+)

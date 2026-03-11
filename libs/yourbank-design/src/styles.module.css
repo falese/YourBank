@@ -250,3 +250,133 @@ em {
 .icon-white {
   color: #ffffff; /* White color */
 }
+
+/* ─── Header nav ──────────────────────────────────────────────────────────── */
+
+.headerNav {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.headerNav button,
+.headerNav a {
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  color: #fff;
+  padding: 6px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  text-decoration: none;
+}
+
+.headerNav button:hover,
+.headerNav a:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #fff;
+}
+
+.headerNav button.active,
+.headerNav a.active {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: #fff;
+}
+
+/* ─── Form components ─────────────────────────────────────────────────────── */
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #444;
+  letter-spacing: 0.3px;
+}
+
+.requiredMark {
+  color: #c0392b;
+  font-weight: bold;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 15px;
+  color: #333;
+  background: #fff;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  appearance: none;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #c0392b;
+  box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.15);
+}
+
+.input:disabled {
+  background: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+}
+
+/* Blocked fields get a subtle lock indicator applied automatically by
+   the TrackingObserver via data-tracking-blocked="true".
+   No component code change is required — the CSS selector does the work. */
+.input[data-tracking-blocked='true'] {
+  border-color: #888;
+  background: #fafafa;
+}
+
+/* ─── Form layout helpers ─────────────────────────────────────────────────── */
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 24px;
+}
+
+@media (max-width: 600px) {
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.formSection {
+  margin-bottom: 32px;
+}
+
+.formSectionTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: #c0392b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e8e8e8;
+  margin-bottom: 20px;
+}
+
+/* secondary button variant */
+.secondary {
+  background-color: transparent;
+  color: #c0392b;
+  border: 2px solid #c0392b;
+}
+
+.secondary:hover {
+  background-color: #fdf0ef;
+}
