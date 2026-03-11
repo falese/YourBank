@@ -38,7 +38,8 @@ jobs:
         run: yarn workspace yourbank-design build
 
       - name: Build example app
-        run: yarn workspace yourbank-design-example build
+        working-directory: libs/yourbank-design/example
+        run: yarn build
         env:
           # Required for CRA to produce correct relative asset paths on GitHub Pages
           PUBLIC_URL: /YourBank
