@@ -43,6 +43,9 @@ jobs:
         env:
           # Required for CRA to produce correct relative asset paths on GitHub Pages
           PUBLIC_URL: /YourBank
+          # CRA 3.x uses webpack 4 which uses a legacy OpenSSL hash that Node 17+
+          # disabled by default. This flag re-enables it without downgrading Node.
+          NODE_OPTIONS: --openssl-legacy-provider
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
