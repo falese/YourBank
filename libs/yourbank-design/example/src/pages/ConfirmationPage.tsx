@@ -125,7 +125,7 @@ const ConfirmationPage: React.FC<ConfirmationPageProps> = ({ formData, onBack })
               marginBottom: 0
             }}
           >
-            🔒 Protected fields (SSN, Date of Birth, Account Number) are not
+            <span role="img" aria-label="lock">🔒</span> Protected fields (SSN, Date of Birth, Account Number) are not
             displayed for security.
           </p>
         </div>
