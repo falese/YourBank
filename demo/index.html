@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YourBank — Design System Example</title>
+  <style>
+    /* ── Reset & base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #333;
+      background: #f0f0f0;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .yb-header {
+      background: #c0392b;
+      color: #fff;
+      padding: 14px 40px;
+      box-shadow: 0 2px 4px rgba(0,0,0,.15);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .yb-logo { font-size: 22px; font-weight: 700; letter-spacing: 1px; }
+    .yb-nav { display: flex; gap: 8px; }
+    .yb-nav button {
+      background: transparent;
+      border: 2px solid rgba(255,255,255,.5);
+      color: #fff;
+      padding: 6px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      transition: background .2s, border-color .2s;
+    }
+    .yb-nav button:hover { background: rgba(255,255,255,.15); border-color: #fff; }
+    .yb-nav button.active { background: rgba(255,255,255,.25); border-color: #fff; }
+
+    /* ── Container / layout ── */
+    .yb-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 24px;
+    }
+    .yb-card-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      padding: 8px 0;
+    }
+
+    /* ── Card ── */
+    .yb-card {
+      background: #f7f7f7;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,.1);
+      flex: 1 1 calc(25% - 16px);
+      min-width: 200px;
+      max-width: 260px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .yb-card--wide { flex: 1 1 calc(50% - 16px); max-width: 500px; }
+    .yb-card--full { flex: 1 1 100%; max-width: 760px; margin: 0 auto; }
+    .yb-card__header {
+      padding: 20px 16px 12px;
+      border-bottom: 1px solid #e0e0e0;
+      text-align: center;
+    }
+    .yb-card__icon { width: 64px; height: 64px; margin: 0 auto 10px; }
+    .yb-card__icon svg { width: 100%; height: 100%; fill: #c0392b; }
+    .yb-card__title { font-size: 16px; font-weight: 700; color: #222; }
+    .yb-card__body { padding: 16px; flex: 1; color: #666; font-size: 14px; text-align: center; }
+    .yb-card__footer {
+      padding: 14px 16px;
+      border-top: 1px solid #e0e0e0;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* ── Buttons ── */
+    .yb-btn {
+      padding: 10px 22px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      transition: background .2s;
+    }
+    .yb-btn--primary { background: #c0392b; color: #fff; }
+    .yb-btn--primary:hover { background: #e74c3c; }
+    .yb-btn--secondary {
+      background: transparent;
+      color: #c0392b;
+      border: 2px solid #c0392b;
+    }
+    .yb-btn--secondary:hover { background: #fdf0ef; }
+
+    /* ── Form ── */
+    .yb-form-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #c0392b;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e8e8e8;
+      margin-bottom: 20px;
+      margin-top: 28px;
+    }
+    .yb-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 24px;
+    }
+    @media (max-width: 580px) { .yb-form-grid { grid-template-columns: 1fr; } }
+    .yb-form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 18px; }
+    .yb-label { font-size: 13px; font-weight: 600; color: #444; }
+    .yb-required { color: #c0392b; }
+    .yb-input {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 15px;
+      color: #333;
+      background: #fff;
+      transition: border-color .2s, box-shadow .2s;
+      appearance: none;
+    }
+    .yb-input:focus {
+      outline: none;
+      border-color: #c0392b;
+      box-shadow: 0 0 0 3px rgba(192,57,43,.12);
+    }
+
+    /* Blocked fields are stamped by the TrackingObserver — no component code needed */
+    .yb-input[data-tracking-blocked="true"] {
+      border-color: #bbb;
+      border-style: dashed;
+      background: #fafafa;
+    }
+
+    .yb-form-intro {
+      background: #fff8f7;
+      border: 1px solid #f5c6c1;
+      border-radius: 6px;
+      padding: 14px 18px;
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 8px;
+      line-height: 1.7;
+    }
+    .yb-form-intro code {
+      background: #f0f0f0;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+    .yb-form-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 28px;
+      gap: 12px;
+    }
+
+    /* ── Confirmation ── */
+    .yb-confirm-icon {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: #e8f5e9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 36px;
+      color: #2e7d32;
+    }
+    .yb-confirm-ref {
+      background: #f7f7f7;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 14px 28px;
+      display: inline-block;
+      margin-bottom: 28px;
+      text-align: center;
+    }
+    .yb-confirm-ref__label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: .5px; }
+    .yb-confirm-ref__value { font-size: 20px; font-weight: 700; letter-spacing: 2px; margin-top: 4px; }
+    .yb-summary-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .yb-summary-table td { padding: 7px 0; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+    .yb-summary-table td:first-child { color: #888; width: 45%; }
+    .yb-summary-table td:last-child { font-weight: 500; }
+    .yb-summary-box {
+      background: #fafafa;
+      border: 1px solid #e8e8e8;
+      border-radius: 6px;
+      padding: 18px 22px;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+
+    /* ── Adobe SDK Event Console ── */
+    #sdk-console {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: #1e1e1e;
+      color: #d4d4d4;
+      font-family: 'Menlo', 'Consolas', monospace;
+      font-size: 12px;
+      z-index: 9999;
+      border-top: 3px solid #c0392b;
+      display: flex;
+      flex-direction: column;
+      max-height: 260px;
+      transition: max-height .25s ease;
+    }
+    #sdk-console.collapsed { max-height: 36px; overflow: hidden; }
+    #sdk-console-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 14px;
+      background: #2d2d2d;
+      cursor: pointer;
+      flex-shrink: 0;
+      user-select: none;
+    }
+    .sdk-dot { color: #c0392b; font-weight: 700; margin-right: 6px; }
+    .sdk-hint { color: #555; font-size: 11px; margin-left: 8px; }
+    #sdk-count { color: #888; }
+    #sdk-log { overflow-y: auto; flex: 1; }
+    .sdk-entry {
+      padding: 3px 16px;
+      border-bottom: 1px solid #2a2a2a;
+      cursor: pointer;
+      line-height: 1.7;
+    }
+    .sdk-entry:hover { background: #252526; }
+    .sdk-time { color: #555; margin-right: 8px; }
+    .sdk-name { font-weight: 600; }
+    .sdk-meta { color: #aaa; margin-left: 10px; font-size: 11px; }
+    .sdk-detail {
+      margin: 4px 0 4px 24px;
+      background: #252526;
+      color: #9cdcfe;
+      padding: 8px 12px;
+      border-radius: 4px;
+      white-space: pre;
+      font-size: 11px;
+      overflow-x: auto;
+    }
+    .sdk-empty { padding: 12px 16px; color: #555; font-style: italic; }
+
+    /* ── Pages ── */
+    .page { display: none; }
+    .page.active { display: block; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="yb-header">
+  <div class="yb-logo">YourBank</div>
+  <nav class="yb-nav">
+    <button id="nav-home" class="active" onclick="navigate('landing')">Home</button>
+    <button id="nav-apply" onclick="navigate('application')">Apply Now</button>
+    <button id="nav-confirm" style="display:none" onclick="navigate('confirmation')">Confirmation</button>
+  </nav>
+</header>
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE: LANDING
+════════════════════════════════════════════════════════════ -->
+<div id="page-landing" class="page active">
+  <div class="yb-container">
+    <div class="yb-card-grid">
+
+      <div class="yb-card">
+        <div class="yb-card__header">
+          <div class="yb-card__icon">
+            <svg viewBox="0 0 20 17" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15.274,6.505H1.252c-0.484,0-0.876,0.392-0.876,0.876v7.887c0,0.484,0.392,0.876,0.876,0.876h14.022c0.483,0,0.876-0.392,0.876-0.876V7.381C16.15,6.897,15.758,6.505,15.274,6.505M8.263,8.257c-1.694,0-3.067,1.374-3.067,3.067c0,1.695,1.373,3.068,3.067,3.068c1.695,0,3.067-1.373,3.067-3.068C11.33,9.631,9.958,8.257,8.263,8.257M18.78,3.875H4.757c-0.484,0-0.876,0.392-0.876,0.876V5.19c0,0.242,0.196,0.438,0.438,0.438c0.242,0,0.438-0.196,0.438-0.438V4.752H18.78v7.888h-1.315c-0.242,0-0.438,0.196-0.438,0.438c0,0.243,0.195,0.438,0.438,0.438h1.315c0.483,0,0.876-0.393,0.876-0.876V4.752C19.656,4.268,19.264,3.875,18.78,3.875"/>
+            </svg>
+          </div>
+          <div class="yb-card__title">YourMoney</div>
+        </div>
+        <div class="yb-card__body">We can help you move money. Anywhere, Anytime.</div>
+        <div class="yb-card__footer">
+          <button class="yb-btn yb-btn--primary" data-track-click onclick="navigate('application')">Get Started</button>
+        </div>
+      </div>
+
+      <div class="yb-card">
+        <div class="yb-card__header">
+          <div class="yb-card__icon">
+            <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18.121,9.88l-7.832-7.836c-0.155-0.158-0.428-0.155-0.584,0L1.842,9.913c-0.262,0.263-0.073,0.705,0.292,0.705h2.069v7.042c0,0.227,0.187,0.414,0.414,0.414h3.725c0.228,0,0.414-0.188,0.414-0.414v-3.313h2.483v3.313c0,0.227,0.187,0.414,0.413,0.414h3.726c0.229,0,0.414-0.188,0.414-0.414v-7.042h2.068h0.004C18.331,10.617,18.389,10.146,18.121,9.88z"/>
+            </svg>
+          </div>
+          <div class="yb-card__title">YourLoans</div>
+        </div>
+        <div class="yb-card__body">We can help you get and manage credit.</div>
+        <div class="yb-card__footer">
+          <button class="yb-btn yb-btn--primary" data-track-click onclick="navigate('application')">Apply Now</button>
+        </div>
+      </div>
+
+      <div class="yb-card">
+        <div class="yb-card__header">
+          <div class="yb-card__icon">
+            <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10.281,1.781C5.75,1.781,2.062,5.469,2.062,10s3.688,8.219,8.219,8.219S18.5,14.531,18.5,10S14.812,1.781,10.281,1.781M10.714,2.659c3.712,0.216,6.691,3.197,6.907,6.908h-6.907V2.659z M10.281,17.354c-4.055,0-7.354-3.298-7.354-7.354c0-3.911,3.067-7.116,6.921-7.341V10c0,0.115,0.045,0.225,0.127,0.305l5.186,5.189C13.863,16.648,12.154,17.354,10.281,17.354M15.775,14.882l-4.449-4.449h6.295C17.522,12.135,16.842,13.684,15.775,14.882"/>
+            </svg>
+          </div>
+          <div class="yb-card__title">YourInsights</div>
+        </div>
+        <div class="yb-card__body">We can help you find your next big thing.</div>
+        <div class="yb-card__footer">
+          <button class="yb-btn yb-btn--primary" data-track-click onclick="navigate('application')">Get Started</button>
+        </div>
+      </div>
+
+      <div class="yb-card">
+        <div class="yb-card__header">
+          <div class="yb-card__icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12,2L15,8L21,9L16,13L17,19L12,16L7,19L8,13L3,9L9,8L12,2Z"/>
+            </svg>
+          </div>
+          <div class="yb-card__title">YourRelationship</div>
+        </div>
+        <div class="yb-card__body">We're in this together.</div>
+        <div class="yb-card__footer">
+          <button class="yb-btn yb-btn--primary" data-track-click onclick="navigate('application')">Get Started</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="yb-card-grid" style="margin-top:16px">
+      <div class="yb-card yb-card--wide">
+        <div class="yb-card__header"><div class="yb-card__title">About Us</div></div>
+        <div class="yb-card__body">Learn who we are, and why we care so much about you.</div>
+        <div class="yb-card__footer"><button class="yb-btn yb-btn--secondary" data-track-click>Learn More</button></div>
+      </div>
+      <div class="yb-card yb-card--wide">
+        <div class="yb-card__header"><div class="yb-card__title">Invest</div></div>
+        <div class="yb-card__body">YourBank — it's not just how we operate, it's how we're owned.</div>
+        <div class="yb-card__footer"><button class="yb-btn yb-btn--secondary" data-track-click>Learn More</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE: APPLICATION FORM
+════════════════════════════════════════════════════════════ -->
+<div id="page-application" class="page">
+  <div class="yb-container">
+    <div class="yb-card-grid">
+      <div class="yb-card yb-card--full">
+        <div class="yb-card__header"><div class="yb-card__title">Loan Application</div></div>
+        <div class="yb-card__body" style="text-align:left; padding:24px 28px;">
+
+          <div class="yb-form-intro">
+            Fields marked with 🔒 are <strong>protected</strong>: the
+            <code>TrackingObserver</code> reads the schema and suppresses all Adobe SDK
+            events on those inputs automatically — no changes to this form were required.
+            The only coupling is the <code>data-field-id</code> attribute used as a CSS
+            selector in <code>tracking-schema.ts</code>.
+          </div>
+
+          <form id="loan-form" data-form-id="loan-application" novalidate>
+
+            <div class="yb-form-section-title">Personal Information</div>
+            <div class="yb-form-grid">
+
+              <div class="yb-form-group">
+                <label class="yb-label" for="first-name">
+                  First Name <span class="yb-required">*</span>
+                </label>
+                <!-- data-field-id="first-name" → TRACKED -->
+                <input class="yb-input" id="first-name" data-field-id="first-name"
+                  type="text" autocomplete="given-name" placeholder="Jane" required />
+              </div>
+
+              <div class="yb-form-group">
+                <label class="yb-label" for="last-name">
+                  Last Name <span class="yb-required">*</span>
+                </label>
+                <!-- data-field-id="last-name" → TRACKED -->
+                <input class="yb-input" id="last-name" data-field-id="last-name"
+                  type="text" autocomplete="family-name" placeholder="Smith" required />
+              </div>
+
+              <div class="yb-form-group">
+                <label class="yb-label" for="email">
+                  Email <span class="yb-required">*</span>
+                </label>
+                <!-- data-field-id="email" → TRACKED -->
+                <input class="yb-input" id="email" data-field-id="email"
+                  type="email" autocomplete="email" placeholder="jane@example.com" required />
+              </div>
+
+              <div class="yb-form-group">
+                <label class="yb-label" for="phone">Phone</label>
+                <!-- data-field-id="phone" → TRACKED -->
+                <input class="yb-input" id="phone" data-field-id="phone"
+                  type="tel" autocomplete="tel" placeholder="(555) 000-0000" />
+              </div>
+
+              <div class="yb-form-group">
+                <label class="yb-label" for="dob">
+                  Date of Birth <span class="yb-required">*</span>
+                  <span title="Protected — not tracked by Adobe SDK">🔒</span>
+                </label>
+                <!--
+                  data-field-id="dob" → BLOCKED: sensitive_pii
+                  TrackingObserver stamps this with data-tracking-blocked="true"
+                  No change to this input was required for blocking to work.
+                -->
+                <input class="yb-input" id="dob" data-field-id="dob"
+                  type="date" autocomplete="bday" required />
+              </div>
+
+              <div class="yb-form-group">
+                <label class="yb-label" for="ssn">
+                  Social Security Number <span class="yb-required">*</span>
+                  <span title="Protected — not tracked by Adobe SDK">🔒</span>
+                </label>
+                <!-- data-field-id="ssn" → BLOCKED: sensitive_pii -->
+                <input class="yb-input" id="ssn" data-field-id="ssn"
+                  type="password" autocomplete="off" placeholder="XXX-XX-XXXX" required />
+              </div>
+
+            </div>
+
+            <div class="yb-form-section-title">Loan Details</div>
+            <div class="yb-form-grid">
+
+              <div class="yb-form-group">
+                <label class="yb-label" for="loan-amount">
+                  Requested Amount ($) <span class="yb-required">*</span>
+                </label>
+                <!-- data-field-id="loan-amount" → TRACKED -->
+                <input class="yb-input" id="loan-amount" data-field-id="loan-amount"
+                  type="number" min="1000" max="100000" step="500"
+                  placeholder="25000" required />
+              </div>
+
+              <div class="yb-form-group">
+                <label class="yb-label" for="loan-purpose">
+                  Loan Purpose <span class="yb-required">*</span>
+                </label>
+                <!-- data-field-id="loan-purpose" → TRACKED -->
+                <select class="yb-input" id="loan-purpose" data-field-id="loan-purpose" required>
+                  <option value="">Select a purpose…</option>
+                  <option value="home-improvement">Home Improvement</option>
+                  <option value="debt-consolidation">Debt Consolidation</option>
+                  <option value="auto">Auto Purchase</option>
+                  <option value="education">Education</option>
+                  <option value="business">Small Business</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <div class="yb-form-group">
+                <label class="yb-label" for="monthly-income">
+                  Monthly Gross Income ($) <span class="yb-required">*</span>
+                </label>
+                <!-- data-field-id="monthly-income" → TRACKED -->
+                <input class="yb-input" id="monthly-income" data-field-id="monthly-income"
+                  type="number" min="0" placeholder="5000" required />
+              </div>
+
+              <div class="yb-form-group">
+                <label class="yb-label" for="account-number">
+                  YourBank Account Number <span class="yb-required">*</span>
+                  <span title="Protected — not tracked by Adobe SDK">🔒</span>
+                </label>
+                <!-- data-field-id="account-number" → BLOCKED: financial -->
+                <input class="yb-input" id="account-number" data-field-id="account-number"
+                  type="password" autocomplete="off" placeholder="Account number" required />
+              </div>
+
+            </div>
+
+            <div class="yb-form-actions">
+              <button type="button" class="yb-btn yb-btn--secondary"
+                onclick="navigate('landing')">Back</button>
+              <button type="submit" class="yb-btn yb-btn--primary">Submit Application</button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE: CONFIRMATION
+════════════════════════════════════════════════════════════ -->
+<div id="page-confirmation" class="page">
+  <div class="yb-container">
+    <div class="yb-card-grid">
+      <div class="yb-card yb-card--full">
+        <div class="yb-card__header"><div class="yb-card__title">Application Submitted</div></div>
+        <div class="yb-card__body" style="text-align:center; padding:28px;">
+          <div class="yb-confirm-icon">✓</div>
+          <h3 id="confirm-name" style="color:#2e7d32;margin-bottom:8px;font-size:20px;font-family:Georgia,serif"></h3>
+          <p style="color:#666;margin-bottom:24px">Your loan application has been received and is under review.</p>
+          <div class="yb-confirm-ref">
+            <div class="yb-confirm-ref__label">Reference Number</div>
+            <div class="yb-confirm-ref__value" id="confirm-ref"></div>
+          </div>
+          <div class="yb-summary-box">
+            <div style="font-weight:700;color:#c0392b;text-transform:uppercase;font-size:12px;letter-spacing:.5px;margin-bottom:14px">
+              Application Summary
+            </div>
+            <table class="yb-summary-table" id="confirm-summary"></table>
+            <p style="font-size:12px;color:#999;margin-top:12px">
+              🔒 Protected fields (SSN, Date of Birth, Account Number) are not displayed for security.
+            </p>
+          </div>
+          <button class="yb-btn yb-btn--primary" onclick="navigate('landing')">Back to Home</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Console spacer -->
+<div id="console-spacer" style="height:260px"></div>
+
+<!-- ══════════════════════════════════════════════════════════
+     Adobe Web SDK Event Console (simulated)
+════════════════════════════════════════════════════════════ -->
+<div id="sdk-console">
+  <div id="sdk-console-header" onclick="toggleConsole()">
+    <span>
+      <span class="sdk-dot">●</span>
+      Adobe Web SDK Event Console
+      <span class="sdk-hint">(simulated — blocked fields never appear here)</span>
+    </span>
+    <span id="sdk-count">0 events ▼</span>
+  </div>
+  <div id="sdk-log">
+    <div class="sdk-empty">Interact with the form to see tracking events…</div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════
+//  Tracking Schema
+//  Source of truth: libs/yourbank-design/example/src/tracking-schema.ts
+// ═══════════════════════════════════════════════════════════════════════
+const SCHEMA = {
+  version: '1.0.0',
+  eventPrefix: 'yourbank:',
+  blockedFields: [
+    { selector: "[data-field-id='ssn']",            reason: 'Social Security Number — sensitive PII',          category: 'sensitive_pii' },
+    { selector: "[data-field-id='dob']",            reason: 'Date of Birth — sensitive PII (CCPA/GDPR)',        category: 'sensitive_pii' },
+    { selector: "[data-field-id='account-number']", reason: 'Account number — sensitive financial data',        category: 'financial'     },
+    { selector: "[data-field-id='password']",       reason: 'Password — credential, must never be tracked',    category: 'credential'    }
+  ]
+};
+
+// ═══════════════════════════════════════════════════════════════════════
+//  TrackingObserver
+//  Source: libs/yourbank-design/src/tracking/TrackingObserver.ts
+// ═══════════════════════════════════════════════════════════════════════
+class TrackingObserver {
+  constructor(schema) {
+    this.schema = schema;
+    this.currentPage = '';
+    this.listening = false;
+    this._handle = this._handleEvent.bind(this);
+  }
+
+  setPage(pageName) {
+    this.currentPage = pageName;
+    this._dispatch('pageView', { eventType: 'pageView', pageName, timestamp: new Date().toISOString() });
+  }
+
+  start() {
+    if (this.listening) return;
+    this.listening = true;
+    ['input','change','focus','blur','click','submit']
+      .forEach(t => document.addEventListener(t, this._handle, true));
+    this._mo = new MutationObserver(mutations =>
+      mutations.forEach(({ addedNodes }) =>
+        addedNodes.forEach(n => { if (n.nodeType === 1) this._stamp(n); })));
+    this._mo.observe(document.body, { childList: true, subtree: true });
+    this._stamp(document.body);
+  }
+
+  stop() {
+    if (!this.listening) return;
+    this.listening = false;
+    ['input','change','focus','blur','click','submit']
+      .forEach(t => document.removeEventListener(t, this._handle, true));
+    if (this._mo) this._mo.disconnect();
+  }
+
+  /** Stamp matching elements with data-tracking-blocked so Adobe SDK can filter natively */
+  _stamp(root) {
+    this.schema.blockedFields.forEach(rule => {
+      try {
+        root.querySelectorAll(rule.selector).forEach(el => {
+          el.setAttribute('data-tracking-blocked', 'true');
+          el.setAttribute('data-tracking-block-reason', rule.reason);
+          el.setAttribute('data-tracking-block-category', rule.category);
+        });
+        if (root.matches && root.matches(rule.selector)) {
+          root.setAttribute('data-tracking-blocked', 'true');
+          root.setAttribute('data-tracking-block-reason', rule.reason);
+          root.setAttribute('data-tracking-block-category', rule.category);
+        }
+      } catch(_) {}
+    });
+  }
+
+  _isBlocked(el) {
+    let node = el;
+    while (node) {
+      if (node.getAttribute && node.getAttribute('data-tracking-blocked') === 'true') return true;
+      for (const rule of this.schema.blockedFields) {
+        try { if (node.matches && node.matches(rule.selector)) return true; } catch(_) {}
+      }
+      node = node.parentElement;
+    }
+    return false;
+  }
+
+  _handleEvent(event) {
+    const t = event.target;
+    if (!t || !t.tagName) return;
+    const tag = t.tagName.toUpperCase();
+    const isField  = ['INPUT','TEXTAREA','SELECT'].includes(tag);
+    const isButton = tag === 'BUTTON';
+    const isAnchor = tag === 'A';
+    const isForm   = tag === 'FORM';
+
+    if (['input','change','focus','blur'].includes(event.type) && !isField) return;
+    if (event.type === 'submit' && !isForm) return;
+    if (event.type === 'click' && !isButton && !isAnchor && !t.dataset.trackClick) return;
+    if (this._isBlocked(t)) return;
+
+    const detail = {
+      eventType:  event.type,
+      timestamp:  new Date().toISOString(),
+      pageName:   this.currentPage,
+      fieldId:    t.dataset ? t.dataset.fieldId : undefined,
+      fieldType:  isField ? t.type : undefined,
+      elementTag: tag.toLowerCase()
+    };
+    if (isButton || isAnchor) detail.elementText = t.textContent.trim();
+    if (isForm) {
+      detail.fieldId = t.id || (t.dataset && t.dataset.formId);
+      this._dispatch('formSubmit', detail);
+    } else {
+      this._dispatch('fieldInteraction', detail);
+    }
+  }
+
+  _dispatch(name, detail) {
+    document.dispatchEvent(
+      new CustomEvent(this.schema.eventPrefix + name, { bubbles: true, detail })
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  Navigation
+// ═══════════════════════════════════════════════════════════════════════
+const observer = new TrackingObserver(SCHEMA);
+let submittedData = null;
+
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.yb-nav button').forEach(b => b.classList.remove('active'));
+  const navMap = { landing: 'nav-home', application: 'nav-apply', confirmation: 'nav-confirm' };
+  const btn = document.getElementById(navMap[page]);
+  if (btn) btn.classList.add('active');
+  observer.setPage(page);
+  window.scrollTo(0, 0);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  Form submission
+// ═══════════════════════════════════════════════════════════════════════
+document.getElementById('loan-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const v = id => document.getElementById(id).value;
+  submittedData = {
+    firstName:     v('first-name'),
+    lastName:      v('last-name'),
+    email:         v('email'),
+    phone:         v('phone'),
+    loanAmount:    v('loan-amount'),
+    loanPurpose:   v('loan-purpose'),
+    monthlyIncome: v('monthly-income')
+    // SSN, DOB, account-number intentionally omitted from summary
+  };
+
+  document.getElementById('confirm-name').textContent =
+    'Thank you, ' + (submittedData.firstName || 'applicant') + '!';
+  document.getElementById('confirm-ref').textContent =
+    'YB-' + Date.now().toString(36).toUpperCase();
+
+  const fmt = (val, prefix) => val ? prefix + Number(val).toLocaleString() : '—';
+  const rows = [
+    ['Name',          ((submittedData.firstName || '') + ' ' + (submittedData.lastName || '')).trim() || '—'],
+    ['Email',         submittedData.email         || '—'],
+    ['Phone',         submittedData.phone          || '—'],
+    ['Loan Amount',   fmt(submittedData.loanAmount, '$')],
+    ['Loan Purpose',  submittedData.loanPurpose    || '—'],
+    ['Monthly Income',fmt(submittedData.monthlyIncome, '$')]
+  ];
+  document.getElementById('confirm-summary').innerHTML =
+    rows.map(([l,v]) => `<tr><td>${l}</td><td>${v}</td></tr>`).join('');
+
+  document.getElementById('nav-confirm').style.display = '';
+  navigate('confirmation');
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+//  Adobe SDK simulator
+//  (In production, Adobe Launch rules listen to these same events)
+// ═══════════════════════════════════════════════════════════════════════
+let eventCount = 0;
+let consoleCollapsed = false;
+const logEl = document.getElementById('sdk-log');
+const countEl = document.getElementById('sdk-count');
+const COLORS = { pageView: '#569cd6', fieldInteraction: '#4ec9b0', formSubmit: '#dcdcaa' };
+
+function addSdkEvent(eventName, detail) {
+  const color = COLORS[eventName] || '#ce9178';
+  const time  = detail.timestamp ? detail.timestamp.slice(11, 23) : '';
+  const meta  = [
+    detail.fieldId     && `fieldId="${detail.fieldId}"`,
+    detail.fieldType   && `type="${detail.fieldType}"`,
+    detail.pageName    && `page="${detail.pageName}"`,
+    detail.elementText && `text="${detail.elementText}"`
+  ].filter(Boolean).join('  ');
+
+  eventCount++;
+  const entry = document.createElement('div');
+  entry.className = 'sdk-entry';
+  entry.innerHTML =
+    `<span class="sdk-time">${time}</span>` +
+    `<span class="sdk-name" style="color:${color}">${eventName}</span>` +
+    (meta ? `<span class="sdk-meta">${meta}</span>` : '');
+
+  entry.addEventListener('click', function() {
+    const existing = this.querySelector('.sdk-detail');
+    if (existing) { existing.remove(); return; }
+    const pre = document.createElement('div');
+    pre.className = 'sdk-detail';
+    pre.textContent = JSON.stringify(detail, null, 2);
+    this.appendChild(pre);
+  });
+
+  const empty = logEl.querySelector('.sdk-empty');
+  if (empty) empty.remove();
+  logEl.insertBefore(entry, logEl.firstChild);
+  countEl.textContent = eventCount + ' event' + (eventCount !== 1 ? 's' : '') + (consoleCollapsed ? ' ▲' : ' ▼');
+}
+
+['pageView', 'fieldInteraction', 'formSubmit'].forEach(name => {
+  document.addEventListener('yourbank:' + name, e => addSdkEvent(name, e.detail));
+});
+
+function toggleConsole() {
+  consoleCollapsed = !consoleCollapsed;
+  document.getElementById('sdk-console').classList.toggle('collapsed', consoleCollapsed);
+  document.getElementById('console-spacer').style.height = (consoleCollapsed ? 36 : 260) + 'px';
+  countEl.textContent = eventCount + ' event' + (eventCount !== 1 ? 's' : '') + (consoleCollapsed ? ' ▲' : ' ▼');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  Boot
+// ═══════════════════════════════════════════════════════════════════════
+observer.start();
+observer.setPage('landing');
+</script>
+</body>
+</html>
